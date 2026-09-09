@@ -1,5 +1,6 @@
 #### MySQL
-Link: [SQLZoo](https://www.sqlzoo.net/wiki/SQL_Tutorial)
+Link: [SQLZoo](https://www.sqlzoo.net/wiki/SQL_Tutorial).
+These answers are not official, since I solved the exercises on my own, but they are correct. 
 
 </br>
 
@@ -227,3 +228,194 @@ Link: [SQLZoo](https://www.sqlzoo.net/wiki/SQL_Tutorial)
     join team t on p.team = t.id
     join game ga on go.game=ga.id
     where go.gtime BETWEEN 91 AND 120
+
+
+### More JOIN operations
+---
+
+1) SELECT id, title
+   FROM movie
+   WHERE yr=1962 and budget > 2000000 
+
+2) select yr from movie where title = 'Citizen Kane'
+   
+3) select id, title, yr 
+    from movie 
+    where title like 'Star Trek%' 
+    order by yr
+   
+4) select id 
+    from actor
+    where name = 'Glenn Close'
+
+5) select id from movie where title = 'Casablanca' and yr = 1942
+
+6) select a.name
+    from actor a
+    join casting c on a.id = c.actorid
+    where c.movieid=11768
+
+7) select a.name
+    from actor a
+    join casting c on a.id = c.actorid
+    join movie m on c.movieid = m.id
+    where m.title='Alien'
+
+8) select m.title
+    from movie m
+    join casting c on m.id = c.movieid
+    join actor a on c.actorid = a.id
+    where a.name = 'Harrison Ford'
+
+9) select m.title
+    from movie m
+    join casting c on m.id = c.movieid
+    join actor a on c.actorid = a.id
+    where a.name = 'Harrison Ford' and ord <> 1
+
+10) select m.title, a.name
+    from movie m
+    join casting c on m.id = c.movieid
+    join actor a on c.actorid = a.id
+    where c.ord = 1 and m.yr = 1962
+
+11) SELECT yr, COUNT(title) 
+    FROM movie 
+            JOIN casting ON movie.id=movieid
+            JOIN actor   ON actorid=actor.id
+    WHERE name='Rock Hudson'
+    GROUP BY yr
+    HAVING COUNT(title) > 2
+
+12) SELECT m.title, a.name
+    FROM movie m 
+    JOIN casting c ON (m.id = c.movieid and ord = 1)
+    JOIN actor a ON c.actorid = a.id
+    WHERE m.id IN (
+      SELECT movieid FROM casting
+      WHERE actorid IN (
+               SELECT id FROM actor 
+               WHERE name = 'Julie Andrews')
+    )
+
+13) select a.name from actor a
+    join casting c on a.id = c.actorid
+    join movie m on c.movieid = m.id
+    where c.ord = 1
+    group by a.name
+    having count(m.title) >= 15
+    order by name asc
+
+14) select m.title, count(c.actorid)
+    from movie m join casting c on m.id = c.movieid
+    where m.yr = 1978
+    group by m.title
+    order by count(c.actorid) desc, m.title
+
+15) select a.name from actor a
+    join casting c on a.id = c.actorid
+    where c.movieid IN (
+    select c.movieid 
+    from casting c join actor a on c.actorid = a.id 
+    where a.name = 'Art Garfunkel') and a.name <> 'Art Garfunkel'
+
+
+### Using Null
+---
+
+1) select name from teacher where dept is null
+   
+2) SELECT teacher.name, dept.name
+   FROM teacher INNER JOIN dept
+           ON (teacher.dept=dept.id)
+   
+3) SELECT teacher.name, dept.name
+ FROM teacher LEFT JOIN dept
+           ON (teacher.dept=dept.id)
+   
+4) SELECT teacher.name, dept.name
+ FROM teacher RIGHT JOIN dept
+           ON (teacher.dept=dept.id)
+  
+5) select name, COALESCE(mobile,'07986 444 2266') from teacher
+
+6) select t.name, COALESCE(d.name,'None')
+    from teacher t 
+    left join dept d on t.dept = d.id
+
+7) select count(name), count(mobile) from teacher
+
+8) select d.name, count(t.name)
+    from dept d 
+    left join teacher t on d.id = t.dept
+    group by d.name
+
+9) select t.name, (
+    case when d.id = 1 or d.id = 2 then 'Sci' 
+         else 'Art' 
+    end
+    ) as dep
+    from teacher t
+    left join dept d on t.dept = d.id
+
+10) select t.name, (
+    case when d.id = 1 or d.id = 2 then 'Sci' 
+         when d.id = 3 then 'Art'
+         else 'None' 
+    end
+    ) as dep
+    from teacher t
+    left join dept d on t.dept = d.id
+
+### Self join
+---
+1) select count(*) from stops
+
+2) select id from stops where name = 'Craiglockhart'
+
+3) select id, name from stops s 
+    join route r on s.id = r.stop 
+    where company='LRT' and num=4
+
+4) SELECT company, num, COUNT(*)
+    FROM route WHERE stop=149 OR stop=53
+    GROUP BY company, num
+    HAVING COUNT(*) = 2
+
+5) SELECT a.company, a.num, a.stop, b.stop as b
+  FROM route a JOIN route b ON
+    (a.company=b.company AND a.num=b.num)
+  WHERE a.stop=53 and b.stop = 149
+
+6) SELECT a.company, a.num, stopa.name, stopb.name
+    FROM route a JOIN route b ON
+      (a.company=b.company AND a.num=b.num)
+      JOIN stops stopa ON (a.stop=stopa.id)
+      JOIN stops stopb ON (b.stop=stopb.id)
+    WHERE stopa.name='Craiglockhart' and stopb.name='London Road'
+
+7) SELECT DISTINCT R1.company, R1.num
+    FROM route R1, route R2
+    WHERE R1.num = R2.num
+      AND R1.company = R2.company
+      AND R1.stop = 115
+      AND R2.stop = 137
+
+8) SELECT R1.company, R1.num
+    FROM route R1, route R2, stops S1, stops S2
+    WHERE R1.num = R2.num
+      AND R1.company = R2.company
+      AND R1.stop = S1.id
+      AND R2.stop = S2.id
+      AND S1.name = 'Craiglockhart'
+      AND S2.name = 'Tollcross'
+
+9) SELECT DISTINCT S2.name, R2.company, R2.num
+    FROM stops S1, stops S2, route R1, route R2
+    WHERE S1.name = 'Craiglockhart'
+      AND S1.id = R1.stop
+      AND R1.company = R2.company
+      AND R1.num = R2.num
+      AND R2.stop = S2.id
+      AND R2.company = 'LRT'
+
