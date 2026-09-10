@@ -15,6 +15,10 @@ Notes:
 - **FLOOR()** round down (224.74 -> 224).
 - **POWER():** ^, raises a number to a specified power.
 - **MOD():** %, calculates the remainder of division between two numbers.
+- int / int = int
+- **Decimal/Float Output:** CAST(10 AS DECIMAL/FLOAT), multiplying by `1.0`, being explicit with types using `::`,  10::DECIMAL/4,
+  10::FLOAT/4,
+- **Calculate Percentages:** (part / total) * 100
 
 </br>
 
@@ -107,7 +111,43 @@ Tasks:
    ```
 
 
-11) []()
+11) [Ad Campaign ROAS](https://datalemur.com/questions/ad-campaign-roas)
+   ```sql
+      SELECT advertiser_id,
+             ROUND( (SUM(revenue)*1.0)/SUM(spend), 2) AS roas
+      FROM ad_campaigns
+      GROUP BY advertiser_id
+      ORDER BY advertiser_id
+      
+   ```
+
+12) []()
    ```sql
 
    ```
+
+13) []()
+   ```sql
+
+   ```
+
+14) []()
+   ```sql
+
+   ```
+
+15) []()
+   ```sql
+
+   ```
+
+16) []()
+   ```sql
+
+   ```
+
+17) []()
+   ```sql
+
+   ```
+
