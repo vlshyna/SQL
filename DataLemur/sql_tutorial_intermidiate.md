@@ -1,3 +1,5 @@
+Postgre14
+
 Useful Links:
 - [Data Lemur](https://datalemur.com/sql-tutorial)
 - Book: [Ace The Data Science Interview](https://www.acethedatascienceinterview.com/)
@@ -27,7 +29,15 @@ Notes:
 - **CASE + WHERE:** filter rows based on specified conditions within the dataset.
 - CASE -> WHEN -> THEN -> ELSE ->  END
 - COUNT() + CASE: COUNT( CASE WHEN ... THEN 1 ELSE NULL)
-- 
+- Condition JOIN: ON ... AND/OR/ranges/pattern matching/subqueries
+-  `CURRENT_DATE, CURRENT_TIME and CURRENT TIMESTAMP ` to return current date, time and timestamp.
+-  `EXTRACT(YEAR/MONTH/DAY/HOUR/MINUTE FROM col) and DATE_PART('year',col) ` to extract specific components of date.
+-  `DATE_TRUNC() ` to round down date or timestamp into specific level of precision.
+-  `INTERVAL ` to add or subtract time intervals in calculations (sent_date + INTERVAL '2 days' AS add_2days)
+-  `TO_CHAR() ` to convert date or timestamp into strings.
+-  `::DATE, TO_DATE(), ::TIMESTAMP, and TO_TIMESTAMP() ` to convert strings into date or timestamp
+-  TO_DATE('2023-08-27', 'YYYY-MM-DD'), TO_TIMESTAMP('2023-08-27 10:30:00', 'YYYY-MM-DD HH:MI:SS')
+-  sent_date::DATE, sent_date::TIMESTAMP 
 
 </br>
 
@@ -161,18 +171,66 @@ Tasks:
       FROM viewership
    ```
 
-15) []()
+15) [Easy SQL JOIN Practice Exercise](https://datalemur.com/questions/sql-join-practice-exercise-robinhood)
    ```sql
-
+      SELECT * 
+      FROM trades t 
+      JOIN users u ON t.user_id = u.user_id
    ```
 
-16) []()
+16) [Cities With Completed Trades](https://datalemur.com/sql-tutorial/sql-joins-inner-outer-left-right)
    ```sql
-
+    SELECT u.city,
+       COUNT(CASE WHEN t.status = 'Completed' THEN 1 ELSE NULL END) AS total_orders
+    FROM trades t 
+    INNER JOIN users u ON t.user_id = u.user_id
+    GROUP BY u.city
+    ORDER BY total_orders DESC
+    LIMIt 3
    ```
 
-17) []()
+17) [Page With No Likes](https://datalemur.com/questions/sql-page-with-no-likes)
    ```sql
-
+      SELECT p.page_id
+      FROM pages p
+      LEFT JOIN page_likes l ON p.page_id=l.page_id
+      GROUP BY p.page_id
+      HAVING COUNT(l.*) = 0
+      ORDER BY page_id ASC
    ```
 
+18) [Advertiser Status](https://datalemur.com/questions/updated-status)
+   ```sql
+    SELECT COALESCE(a.user_id, d.user_id) AS user_id,
+       CASE
+           WHEN d.paid IS NULL THEN 'CHURN'
+           WHEN a.status IN ('NEW', 'EXISTING') AND d.paid IS NOT NULL THEN 'EXISTING'
+           WHEN a.status='CHURN' AND d.paid IS NOT NULL THEN 'RESURRECT'
+           WHEN a.status IS NULL AND d.paid IS NOT NULL THEN 'NEW'
+           ELSE 'EXISTING'
+       END AS status
+    FROM advertiser a
+    FULL OUTER JOIN daily_pay d ON a.user_id = d.user_id
+    ORDER BY user_id
+   ```
+
+19) [Average Post Hiatus (Part 1)](https://datalemur.com/questions/sql-average-post-hiatus-1)
+   ```sql
+      SELECT user_id,
+             DATE_PART('day', (MAX(post_date) - MIN(post_date)) ) AS days_between
+      FROM posts
+      WHERE DATE_PART('year',post_date) = 2021
+      GROUP BY user_id
+      HAVING COUNT(user_id)>1
+   ```
+
+20) [Second Day Confirmation](https://datalemur.com/questions/second-day-confirmation)
+   ```sql
+      SELECT e.user_id
+      FROM emails e
+      JOIN texts t ON e.email_id = t.email_id
+      WHERE t.signup_action = 'Confirmed'
+      GROUP BY e.user_id, t.action_date, e.signup_date
+      HAVING t.action_date - INTERVAL '1 day' = e.signup_date
+
+   ```
