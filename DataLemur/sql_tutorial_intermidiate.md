@@ -19,6 +19,15 @@ Notes:
 - **Decimal/Float Output:** CAST(10 AS DECIMAL/FLOAT), multiplying by `1.0`, being explicit with types using `::`,  10::DECIMAL/4,
   10::FLOAT/4,
 - **Calculate Percentages:** (part / total) * 100
+- **NULL:** COALESCE(), IFNULL()
+- **NULL** = the smallest value in SQL sorting order
+- **COALESCE():** Versatile for multiple arguments, it returns the first non-null value among them. COALESCE(arg1, arg2, arg3, ...)
+- **IFNULL():** Handles two arguments, returning the second if the first is null; else, it returns the first. IFNULL(expression, value_if_null)
+- **CASE + SELECT:** create new columns, categorize data, or perform calculations based on specified conditions.
+- **CASE + WHERE:** filter rows based on specified conditions within the dataset.
+- CASE -> WHEN -> THEN -> ELSE ->  END
+- COUNT() + CASE: COUNT( CASE WHEN ... THEN 1 ELSE NULL)
+- 
 
 </br>
 
@@ -121,19 +130,35 @@ Tasks:
       
    ```
 
-12) []()
+12) [Unfinished Parts](https://datalemur.com/questions/tesla-unfinished-parts)
    ```sql
-
+      SELECT part, 
+         assembly_step
+      FROM parts_assembly
+      WHERE finish_date IS NULL
    ```
 
-13) []()
+13) [SQL Tutorial Lesson: Superheroes' Likes](https://datalemur.com/questions/sql-case-marvel-avengers)
    ```sql
-
+      SELECT actor, 
+       character,
+       platform, 
+       avg_likes,
+       CASE
+           WHEN avg_likes >= 15000 THEN 'Super Likes'
+           WHEN avg_likes BETWEEN 5000 AND 14999 THEN 'Good Likes'
+           ELSE 'Low Likes'
+      END AS likes_category
+      FROM marvel_avengers 
+      ORDER BY avg_likes DESC
    ```
 
-14) []()
+14) [Laptop vs. Mobile Viewership](https://datalemur.com/questions/laptop-mobile-viewership)
    ```sql
-
+      SELECT 
+          SUM(CASE WHEN device_type = 'laptop' THEN 1 ELSE 0 END) AS laptop_reviews,
+          SUM(CASE WHEN device_type IN ('tablet','phone') THEN 1 ELSE 0 END) AS mobile_views
+      FROM viewership
    ```
 
 15) []()
