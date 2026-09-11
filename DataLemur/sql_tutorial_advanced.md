@@ -116,7 +116,7 @@ ROW_NUMBER vs. RANK vs. DENSE_RANK
    WHERE artist_rank <= 5;
    ```
 
-5) []()
+5) [Histogram of Users and Purchases](https://datalemur.com/questions/histogram-users-purchases)
    ```sql
       WITH transaction_date_rank AS(
          SELECT DENSE_RANK() OVER (
@@ -139,15 +139,63 @@ ROW_NUMBER vs. RANK vs. DENSE_RANK
    ```
 
 
-1) []()
+6) [Odd and Even Measurements](https://datalemur.com/questions/odd-even-measurements)
    ```sql
-
+     WITH
+         measurement_rank AS(
+            SELECT 
+                measurement_time::DATE as measurement_day,
+                measurement_value,
+                TO_CHAR(measurement_time,'YYYY-MM-DD') AS char_data,
+                RANK() OVER (
+                      PARTITION BY TO_CHAR(measurement_time,'YYYY-MM-DD')
+                      ORDER BY measurement_time) AS measure_rank
+            FROM measurements
+         ), 
+   
+         measurement_sum AS(
+            SELECT char_data, 
+                   SUM(
+                      CASE 
+                          WHEN measure_rank%2=1 THEN measurement_value
+                          ELSE 0
+                      END
+                   ) AS odd_sum, 
+                   SUM(
+                      CASE 
+                          WHEN measure_rank%2=0 THEN measurement_value
+                          ELSE 0
+                      END
+                   ) AS even_sum
+            FROM measurement_rank
+            GROUP BY char_data
+   )
+   
+   SELECT char_data::TIMESTAMP AS measurement_day,
+          odd_sum,
+          even_sum
+   FROM measurement_sum
+    
    ```
 
-
-1) []()
+Official Solution:
    ```sql
-
+      WITH ranked_measurements AS (
+        SELECT 
+          CAST(measurement_time AS DATE) AS measurement_day, 
+          measurement_value, 
+          ROW_NUMBER() OVER (
+            PARTITION BY CAST(measurement_time AS DATE) 
+            ORDER BY measurement_time) AS measurement_num 
+        FROM measurements
+      ) 
+      
+      SELECT 
+        measurement_day, 
+        SUM(measurement_value) FILTER (WHERE measurement_num % 2 != 0) AS odd_sum, 
+        SUM(measurement_value) FILTER (WHERE measurement_num % 2 = 0) AS even_sum 
+      FROM ranked_measurements
+      GROUP BY measurement_day;
    ```
 
 
