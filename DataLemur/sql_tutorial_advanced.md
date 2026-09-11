@@ -25,6 +25,20 @@ Notes (Clean SQL Queries):
 - Format Dates Consistently. Use a consistent date format to prevent ambiguity: `'YYYY-MM-DD'` format
 - Comment Wisely. Use comments to explain your queries, but avoid writing long ones between queries. Briefly explain each step for clarity. Use `--` to write single-line comments.  Use `/* ... */` for longer comments and make sure they add valuable insights.
 
+Generic syntax of ranking functions:
+```sql
+SELECT 
+  RANK() / DENSE_RANK() / ROW_NUMBER() OVER ( -- Compulsory expression
+    PARTITION BY partitioning_expression -- Optional expression
+    ORDER BY order_expression) -- Compulsory expression
+FROM table_name;
+   ```
+
+ROW_NUMBER vs. RANK vs. DENSE_RANK
+- `ROW_NUMBER():` This function assigns a unique sequential number to each row within a window. It's like numbering the rows in order.
+- `RANK():` The RANK() function handles tied values by assigning the same rank to them. However, it may skip subsequent ranks, leaving gaps in the sequence.
+- `DENSE_RANK():` Similar to RANK(), DENSE_RANK() also handles tied values by assigning the same rank. However, it does not skip ranks, resulting in no gaps in the sequence.
+
 
 1) [Supercloud Customer](https://datalemur.com/questions/supercloud-customer)
    ```sql
@@ -81,12 +95,70 @@ Notes (Clean SQL Queries):
    ORDER BY issued_amount DESC;
    ```
 
+4) [Top 5 Artists](https://datalemur.com/questions/top-fans-rank)
+   ```sql
+   WITH top_cte AS(
+     SELECT 
+       artists.artist_name,
+       DENSE_RANK() OVER (
+         ORDER BY COUNT(songs.song_id) DESC) AS artist_rank
+     FROM artists 
+     INNER JOIN songs
+       ON artists.artist_id = songs.artist_id
+     INNER JOIN global_song_rank AS song_rank
+       ON songs.song_id = song_rank.song_id
+     WHERE song_rank.rank <= 10
+     GROUP BY artists.artist_name 
+   )
+   
+   SELECT artist_name, artist_rank
+   FROM top_cte
+   WHERE artist_rank <= 5;
+   ```
+
+5) []()
+   ```sql
+      WITH transaction_date_rank AS(
+         SELECT DENSE_RANK() OVER (
+                   PARTITION BY user_id ORDER BY transaction_date DESC) AS date_rank,
+                user_id,
+                COUNT(*) AS purchase_count,
+                transaction_date
+         
+         FROM user_transactions
+         GROUP BY user_id, transaction_date
+       )
+         
+       SELECT transaction_date,
+                user_id,
+                purchase_count
+       FROM transaction_date_rank
+       WHERE date_rank=1
+       ORDER BY transaction_date ASC
+
+   ```
+
+
 1) []()
    ```sql
 
    ```
 
+
 1) []()
    ```sql
 
    ```
+
+
+1) []()
+   ```sql
+
+   ```
+
+
+1) []()
+   ```sql
+
+   ```
+
