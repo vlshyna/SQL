@@ -94,7 +94,7 @@ Self-Joins Example
          ORDER BY b1.book_title,
          LIMIT 50; 
    ```
-
+- INTERSECT: vertical inner join: (SELECT FROM) INTERSECT (SELECT FROM)
 <br>
 
 1) [Supercloud Customer](https://datalemur.com/questions/supercloud-customer)
