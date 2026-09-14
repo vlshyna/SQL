@@ -57,6 +57,45 @@ Time-series window functions:
    ```
 
 <br>
+UNION, INTERCEPT, EXCEPT:
+- `UNION`: combine tables VERTICALLY, `JOIN`: HORIZONTALLY
+- `UNION ALL` keeps everything, including duplicates.
+- `UNION` removes duplicates, so you get only the unique items.
+
+<br>
+
+Self-Joins Example
+ ```sql
+      SELECT
+        b1.genre,
+        b1.book_title AS current_book,
+        b2.book_title AS suggested_book
+      FROM goodreads AS b1
+      INNER JOIN goodreads AS b2
+        ON b1.genre = b2.genre
+      WHERE b1.book_id != b2.book_id
+      ORDER BY b1.book_title;
+
+--------------------------------------------------
+
+      SELECT
+           b1.genre,
+           b1.book_title AS current_book,
+           b2.book_title AS suggested_book_1,
+           b3.book_title AS suggested_book_2
+         FROM goodreads AS b1
+         INNER JOIN goodreads AS b2 
+           ON b1.genre = b2.genre
+         INNER JOIN goodreads as b3 
+           ON b1.genre = b3.genre
+         WHERE b1.book_id != b2.book_id
+           AND b1.book_id != b3.book_id
+           AND b2.book_id != b3.book_id
+         ORDER BY b1.book_title,
+         LIMIT 50; 
+   ```
+
+<br>
 
 1) [Supercloud Customer](https://datalemur.com/questions/supercloud-customer)
    ```sql
@@ -258,9 +297,14 @@ Official Solution:
        
    ```
 
-1) []()
+9) [Well Paid Employees](https://datalemur.com/questions/sql-well-paid-employees)
    ```sql
-
+      SELECT emp.employee_id AS emp_id,
+             emp.name AS emp_name
+      FROM employee AS mgr
+      INNER JOIN employee AS emp 
+        ON mgr.employee_id=emp.manager_id
+      WHERE emp.salary > mgr.salary
    ```
 
 1) []()
