@@ -3,6 +3,8 @@ Useful Links:
 - [Ultimate SQL Interview Guide For Data Scientists & Data Analysts](https://datalemur.com/blog/sql-interview-guide#practice-take-home-sql-interview-challenges)
 - [SQL Formatter](https://www.dpriver.com/pp/sqlformat.htm)
 
+<br>
+
 Notes (Clean SQL Queries):
 - **Use uppercase** for the SQL keywords and functions
 - Use **snake case**
@@ -25,6 +27,8 @@ Notes (Clean SQL Queries):
 - Format Dates Consistently. Use a consistent date format to prevent ambiguity: `'YYYY-MM-DD'` format
 - Comment Wisely. Use comments to explain your queries, but avoid writing long ones between queries. Briefly explain each step for clarity. Use `--` to write single-line comments.  Use `/* ... */` for longer comments and make sure they add valuable insights.
 
+<br>
+
 Generic syntax of ranking functions:
 ```sql
 SELECT 
@@ -34,11 +38,25 @@ SELECT
 FROM table_name;
    ```
 
+<br>
+
 ROW_NUMBER vs. RANK vs. DENSE_RANK
 - `ROW_NUMBER():` This function assigns a unique sequential number to each row within a window. It's like numbering the rows in order.
 - `RANK():` The RANK() function handles tied values by assigning the same rank to them. However, it may skip subsequent ranks, leaving gaps in the sequence.
 - `DENSE_RANK():` Similar to RANK(), DENSE_RANK() also handles tied values by assigning the same rank. However, it does not skip ranks, resulting in no gaps in the sequence.
 
+<br>
+
+Time-series window functions:
+- LEAD(): future, LAG(): past
+ ```sql
+  LEAD(column_name, offset) OVER (  -- Compulsory expression
+  PARTITION BY partition_column -- Optional expression
+  ORDER BY order_column) -- Compulsory expression
+  
+   ```
+
+<br>
 
 1) [Supercloud Customer](https://datalemur.com/questions/supercloud-customer)
    ```sql
@@ -199,14 +217,63 @@ Official Solution:
    ```
 
 
+7) [SQL Tutorial Lesson: Stock Performance](https://datalemur.com/questions/sql-bloomberg-stock-performance)
+   ```sql
+      SELECT EXTRACT(MONTH FROM date) as month,
+             close,
+             LEAD(close) OVER (ORDER BY date) - close AS difference_1m,
+             LEAD(close,3) OVER (ORDER BY date) - close AS difference_3m
+      FROM stock_prices 
+      WHERE ticker = 'GOOG' AND EXTRACT(YEAR FROM date) = 2023
+      LIMIT 10;
+   ```
+
+
+8) [Y-on-Y Growth Rate](https://datalemur.com/questions/yoy-growth-rate)
+   ```sql
+      WITH 
+         year_spend AS(
+             SELECT product_id,
+                    SUM(spend) AS cur_total_spend,
+                    EXTRACT(YEAR FROM transaction_date) AS year
+             FROM user_transactions
+             GROUP BY product_id, year
+         ),
+         
+         prev_month AS(
+             SELECT 
+               product_id,
+               cur_total_spend,
+               year,
+               LAG(cur_total_spend) OVER (PARTITION BY product_id ORDER BY year) AS prev_year_spend
+             FROM year_spend
+         )
+         
+         SELECT year,
+                product_id,
+                cur_total_spend,
+                prev_year_spend,
+               ROUND( (cur_total_spend - prev_year_spend)/prev_year_spend * 100,2) AS yoy_rate
+         FROM prev_month
+       
+   ```
+
 1) []()
    ```sql
 
    ```
 
+1) []()
+   ```sql
+
+   ```
 
 1) []()
    ```sql
 
    ```
 
+1) []()
+   ```sql
+
+   ```
